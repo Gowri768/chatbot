@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #chat-container {
+        width: 50%;
+        margin: auto;
+      }
+      .message {
+        padding: 10px;
+        margin: 5px;
+        border-radius: 5px;
+      }
+      .user {
+        background-color: #d1e7ff;
+        text-align: right;
+      }
+      .bot {
+        background-color: #e2e2e2;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Chatbot</h1>
+    <div id="chat-container">
+      <div id="chat-box"></div>
+      <input type="text" id="user-input" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+      function sendMessage() {
+        let userInput = document.getElementById("user-input").value;
+        if (!userInput) return;
+
+        let chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div class="message user">${userInput}</div>`;
+
+        // Send user message to Flask backend
+        fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userInput }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            let botMessage = data.response || "Error: No response";
+            chatBox.innerHTML += `<div class="message bot">${botMessage}</div>`;
+          })
+          .catch((error) => console.error("Error:", error));
+
+        document.getElementById("user-input").value = "";
+      }
+    </script>
+  </body>
+</html>
